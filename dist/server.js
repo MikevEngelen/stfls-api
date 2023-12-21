@@ -1,63 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const gps_1 = require("./routes/gps");
 const express = require('express');
 const app = express();
 const PORT = 3000;
-// config for your database
-// const config = {
-//   user: 'DESKTOP-RESFGB5\mikev',
-//   password: '',
-//   server: '(localdb)\MSSQLLocalDB',
-//   database: 'moovd_gps_projectContext-c146eb5a-f487-41dd-b58f-5115aab599b4'
-// };
-const sql = require('mssql/msnodesqlv8');
-const conn = new sql.ConnectionPool({
-    database: 'moovd_gps_projectContext-c146eb5a-f487-41dd-b58f-5115aab599b4',
-    server: 'DESKTOP-RESFGB5\LOCALDB#3A01F028',
-    driver: 'msnodesqlv8',
-    options: {
-        trustedConnection: true
-    }
-});
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.get('/', (req, res) => {
     res.send('Stofloos is the best!');
 });
-const gps = [
-    {
-        DeviceId: 0,
-        DeviceType: "Aircraft",
-        TimeStamp: new Date().toTimeString(),
-        Location: "L1"
-    },
-    {
-        DeviceId: 1,
-        DeviceType: "Aircraft",
-        TimeStamp: new Date().toTimeString(),
-        Location: "L2"
-    },
-    {
-        DeviceId: 2,
-        DeviceType: "Personal",
-        TimeStamp: new Date().toTimeString(),
-        Location: "L3"
-    }
-];
-app.get('/api/gps', (req, res) => {
-    sql.connect(conn, function (err) {
-        if (err)
-            console.log(err);
-        // create Request object
-        var request = new sql.Request();
-        // query to the database and get the records
-        request.query('select * from dbo.GPS', function (err, recordset) {
-            if (err)
-                console.log(err);
-            // send records as a response
-            res.json(recordset);
-        });
-    });
-    //res.json(gps)
-});
+app.use("/gps", gps_1.default);
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
